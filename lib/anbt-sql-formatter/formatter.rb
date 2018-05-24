@@ -243,6 +243,11 @@ class AnbtSql
 
         elsif token._type == AnbtSql::TokenConstants::KEYWORD # ****
 
+          #Fix missing index after group by
+          if @group_order_by_check
+            indent += 1
+          end
+
           # To deal with multiple join conditions
           if not equals_ignore_case(token.string, "AND")
             encounter_on = false
