@@ -126,7 +126,6 @@ class AnbtSql
       end
     end
 
-
     def remove_symbol_side_space(tokens)
       prev_token = nil
 
@@ -228,12 +227,7 @@ class AnbtSql
 
             # ','の前で改行
           elsif token.string == ","
-            #If we've at the end of a CTE
-            if prev.string == ")"
-              index += insert_return_and_indent(tokens, index + 1, indent, "new_line")
-            else
-              index += insert_return_and_indent(tokens, index, indent, "x")
-            end
+            index += insert_return_and_indent(tokens, index, indent, "x")
 
           elsif token.string == ";"
             # 2005.07.26 Tosiki Iga とりあえずセミコロンでSQL文がつぶれないように改良
@@ -392,7 +386,7 @@ class AnbtSql
       }
     end
 
-    #  before: [..., 8"(", 7" ", 6"X", 5" ", 4"+,-,*,/", 3" ", 2"Y", 1" ", 0")", ...]
+    #  before: [..., "(", " ", "X", " ", "+,-,*,/", " ", "Y", " ", ")", ...]
     #  after:  [..., "(X)", ...]
     def special_treatment_for_parenthesis_with_one_math_expression(tokens)
         (tokens.size - 1).downto(8).each{|index|
@@ -428,6 +422,37 @@ class AnbtSql
         }
       end
 
+      #  before: [..., 6")", 5"\n", 4",", 3" ", 2"cte_name", 1" ", 0"as" ...]
+      #  after:  [..., "),\n\nname as", ...]
+      def special_treatment_for_CTE_end(tokens)
+          (tokens.size - 1).downto(6).each{|index|
+            next if (index >= tokens.size())
+
+            t0 = ArrayUtil.get(tokens, index    )
+            t1 = ArrayUtil.get(tokens, index - 1)
+            t2 = ArrayUtil.get(tokens, index - 2)
+            t3 = ArrayUtil.get(tokens, index - 3)
+            t4 = ArrayUtil.get(tokens, index - 4)
+            t5 = ArrayUtil.get(tokens, index - 5)
+            t6 = ArrayUtil.get(tokens, index - 6)
+
+            if (equals_ignore_case(t6.string      , ")" ) &&
+                equals_ignore_case(t5.string.strip, ""  ) &&
+                equals_ignore_case(t4.string      , "," ) &&
+                equals_ignore_case(t3.string.strip, ""  ) &&
+                equals_ignore_case(t1.string.strip, ""  ) &&
+                equals_ignore_case(t0.string      , "as")  )
+              t6.string = t6.string + t4.string + "\n" + "\n" + t2.string + t1.string + t0.string
+              ArrayUtil.remove(tokens, index    )
+              ArrayUtil.remove(tokens, index - 1)
+              ArrayUtil.remove(tokens, index - 2)
+              ArrayUtil.remove(tokens, index - 3)
+              ArrayUtil.remove(tokens, index - 4)
+              ArrayUtil.remove(tokens, index - 5)
+            end
+          }
+        end
+
 
     def format_list(tokens)
       return [] if tokens.empty?
@@ -461,6 +486,7 @@ class AnbtSql
       insert_space_between_tokens(tokens)
 
       special_treatment_for_parenthesis_with_one_math_expression(tokens)
+      special_treatment_for_CTE_end(tokens)
 
       return tokens
     end
