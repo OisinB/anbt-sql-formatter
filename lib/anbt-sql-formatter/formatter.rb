@@ -126,6 +126,20 @@ class AnbtSql
       end
     end
 
+    #  [".", "*"] => [".*"]
+    def select_all_from_table_operater(tokens)
+      index = 0
+      # Length of tokens changes in loop!
+      while index < tokens.size - 2
+        if (tokens[index    ].string.end_with?(".") &&
+            tokens[index + 1].string == "*")
+          tokens[index].string = tokens[index].string + "*"
+          ArrayUtil.remove(tokens, index + 1)
+        end
+        index += 1
+      end
+    end
+
     def remove_symbol_side_space(tokens)
       prev_token = nil
 
@@ -476,6 +490,7 @@ class AnbtSql
       remove_symbol_side_space(tokens)
       concat_operator_for_oracle(tokens)
       cast_operator_for_redshift(tokens)
+      select_all_from_table_operater(tokens)
 
       encounter_between = false
       encounter_on = false
