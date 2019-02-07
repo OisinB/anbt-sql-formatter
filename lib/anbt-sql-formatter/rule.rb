@@ -53,8 +53,8 @@ class AnbtSql
 
       @space_after_comma = true
 
-      # __foo
-      # ____KW
+      # __foo_KW
+      # ____bar
       @kw_plus1_indent_x_nl = %w(INSERT INTO CREATE DROP TRUNCATE TABLE CASE)
 
       # ____foo
@@ -73,13 +73,14 @@ class AnbtSql
 
       # __foo
       # __KW_bar
-      @kw_nl_x = %w(OR THEN ELSE WHEN JOIN)
+      @kw_nl_x = %w(OR THEN ELSE WHEN JOIN WITH)
       @kw_nl_x.concat ["LEFT JOIN", "RIGHT JOIN", "INNER JOIN",
         "FULL OUTER JOIN", "CROSS JOIN"]
       # @kw_nl_x = %w(OR WHEN ELSE) "ORDER BY", "GROUP BY",
 
       @kw_multi_words = ["ORDER BY", "GROUP BY", "LEFT JOIN", "RIGHT JOIN", "INNER JOIN",
-        "FULL OUTER JOIN", "CROSS JOIN", "UNION ALL", "SELECT DISTINCT", "WITHIN GROUP"]
+        "FULL OUTER JOIN", "CROSS JOIN", "UNION ALL", "SELECT DISTINCT", "WITHIN GROUP",
+        "CREATE VIEW"]
 
       # 関数の名前。
       # Java版は初期値 null
@@ -114,7 +115,7 @@ class AnbtSql
          "CURRENT_TIMESTAMP", "UNIX_TIMESTAMP", "FROM_UNIXTIME",
          "SEC_TO_TIME", "TIME_TO_SEC", "DATEDIFF", "DATEADD", "DATE_TRUNC",
          # Redshift
-         "NVL", "LISTAGG", "ROW_NUMBER", "OVER", "CAST", "IN", "COALESCE",
+         "NVL", "LISTAGG", "ROW_NUMBER", "OVER", "CAST", "IN" "COALESCE",
          "LAST_VALUE", "FIRST_VALUE", "LAG", "LEAD", "EXTRACT", "WITHIN GROUP",
          "COUNT", "SUM", "SUBSTR", "DATE", "AVG", "LEN", "DENSE_RANK", "LEAST",
          "GREATEST", "FUNC_SHA1", "JSON_EXTRACT_PATH_TEXT", "CEIL", "FLOOR",
