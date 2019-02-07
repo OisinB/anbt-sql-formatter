@@ -257,7 +257,9 @@ class AnbtSql
           end
 
           # To deal with multiple join conditions
-          if not equals_ignore_case(token.string, "AND")
+          if not (equals_ignore_case(token.string, "AND") ||
+                  equals_ignore_case(token.string, "OR" ) ||
+                  equals_ignore_case(token.string, "IN" )  )
             encounter_on = false
           end
 
@@ -266,7 +268,7 @@ class AnbtSql
               equals_ignore_case(token.string, "SELECT"         ) ||
               equals_ignore_case(token.string, "SELECT DISTINCT") ||
               equals_ignore_case(token.string, "UNION ALL"      ) ||
-              equals_ignore_case(token.string, "UNION"      ) ||
+              equals_ignore_case(token.string, "UNION"          ) ||
               equals_ignore_case(token.string, "UPDATE"         )  )
 
             # If we're at the final select after several CTEs
@@ -337,7 +339,8 @@ class AnbtSql
             encounter_on = true
           end
 
-          if equals_ignore_case(token.string, "AND")
+          if (equals_ignore_case(token.string, "AND") ||
+              equals_ignore_case(token.string, "OR" )  )
             # BETWEEN のあとのANDは改行しない。
             if not encounter_between
               index += insert_return_and_indent(tokens, index, indent)
